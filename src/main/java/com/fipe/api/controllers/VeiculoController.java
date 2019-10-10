@@ -1,10 +1,13 @@
 package com.fipe.api.controllers;
 
 import com.fipe.api.model.Veiculo;
+import com.fipe.api.model.VeiculoFipe;
+import com.fipe.api.service.VeiculoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -26,7 +29,7 @@ public class VeiculoController {
         veiculo.setAnoModelo("2002 Gasolina");
         veiculo.setAutenticacao("g8xhv9w2wfp");
         veiculo.setDataConsulta("quinta-feira, 3 de outubro de 2019 12:00");
-        veiculo.setPrecoMedio("R$ 13.099,00");
+        veiculo.setValor("R$ 13.099,00");
         veiculos.add(veiculo);
 
         Veiculo veiculo2 = new Veiculo();
@@ -37,11 +40,22 @@ public class VeiculoController {
         veiculo2.setAnoModelo("2002 Gasolina");
         veiculo2.setAutenticacao("jrbynjqr7rrl");
         veiculo2.setDataConsulta("quinta-feira, 3 de outubro de 2019 12:02");
-        veiculo2.setPrecoMedio("R$ 16.974,00");
+        veiculo2.setValor("R$ 16.974,00");
         veiculos.add(veiculo);
 
         return new ResponseEntity<>(
                 veiculos,
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping
+    public ResponseEntity<VeiculoFipe> findVeiculoByCodFipe(
+            @RequestParam(value = "codFipe") String codFipe,
+            @RequestParam(value = "anoModelo") int anoModelo
+    ) {
+        return new ResponseEntity<>(
+                new VeiculoService().getVeiculoFipe(anoModelo, codFipe),
                 HttpStatus.OK
         );
     }
