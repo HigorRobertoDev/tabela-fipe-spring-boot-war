@@ -52,10 +52,12 @@ public class VeiculoController {
     @GetMapping
     public ResponseEntity<VeiculoFipe> findVeiculoByCodFipe(
             @RequestParam(value = "codFipe") String codFipe,
-            @RequestParam(value = "anoModelo") int anoModelo
+            @RequestParam(value = "anoModelo") int anoModelo,
+            @RequestParam(value = "codigoTipoVeiculo", defaultValue = "1") int codigoTipoVeiculo,
+            @RequestParam(value = "codigoTipoCombustivel", defaultValue = "1") int codigoTipoCombustivel
     ) {
         return new ResponseEntity<>(
-                new VeiculoService().getVeiculoFipe(anoModelo, codFipe),
+                new VeiculoService().getVeiculoFipe(anoModelo, codFipe, codigoTipoVeiculo, codigoTipoCombustivel),
                 HttpStatus.OK
         );
     }

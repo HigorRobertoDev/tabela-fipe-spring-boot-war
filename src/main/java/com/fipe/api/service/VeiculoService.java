@@ -15,28 +15,33 @@ import java.util.List;
 
 public class VeiculoService {
 
+    public Gson gson = new GsonBuilder().serializeNulls().create();
+
     public List<MesReferenciaFipe> getMesReferenciaFipe() {
         String output = createClientResponse(
             "https://veiculos.fipe.org.br/api/veiculos/ConsultarTabelaDeReferencia",
             null
         );
 
-        Gson gson = new GsonBuilder().serializeNulls().create();
         Type listType = new TypeToken<ArrayList<MesReferenciaFipe>>(){}.getType();
         return gson.fromJson(output, listType);
     }
 
-    public VeiculoFipe getVeiculoFipe(int anoModelo, String codFipe) {
+    public VeiculoFipe getVeiculoFipe(int anoModelo, String codFipe, int codigoTipoVeiculo, int codigoTipoCombustivel) {
         List<MesReferenciaFipe> referenciaFipeList = getMesReferenciaFipe();
+
+        String tipoVeiculo = "carro";
+        if (codigoTipoVeiculo == 2) tipoVeiculo = "moto";
+        else if(codigoTipoVeiculo == 3) tipoVeiculo = "caminhao";
 
         ParamFipe paramFipe = ParamFipe.builder()
                 .codigoTabelaReferencia(referenciaFipeList.get(0).getCodigo())
                 .codigoMarca("")
                 .codigoModelo("")
-                .codigoTipoVeiculo(1)
+                .codigoTipoVeiculo(codigoTipoVeiculo)
                 .anoModelo(anoModelo)
-                .codigoTipoCombustivel(1)
-                .tipoVeiculo("carro")
+                .codigoTipoCombustivel(codigoTipoCombustivel)
+                .tipoVeiculo(tipoVeiculo)
                 .modeloCodigoExterno(codFipe)
                 .tipoConsulta("codigo")
                 .build();
@@ -46,14 +51,12 @@ public class VeiculoService {
                 paramFipe
         );
 
-        Gson gson = new GsonBuilder().serializeNulls().create();
         VeiculoFipe veiculoFipe = gson.fromJson(output, VeiculoFipe.class);
-
         return veiculoFipe;
     }
 
     public String createClientResponse(String url, ParamFipe paramFipe) {
-        String paramFipeJson = new Gson().toJson(paramFipe);
+        String paramFipeJson = gson.toJson(paramFipe);
         Client client = Client.create();
         WebResource webResource = client
                 .resource(url);
