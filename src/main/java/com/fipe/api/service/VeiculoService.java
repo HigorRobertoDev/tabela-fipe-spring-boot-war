@@ -1,18 +1,36 @@
 package com.fipe.api.service;
 
+import com.fipe.api.model.MesReferenciaFipe;
 import com.fipe.api.model.ParamFipe;
 import com.fipe.api.model.VeiculoFipe;
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
 public class VeiculoService {
 
+    public List<MesReferenciaFipe> getMesReferenciaFipe() {
+        String output = createClientResponse(
+            "https://veiculos.fipe.org.br/api/veiculos/ConsultarTabelaDeReferencia",
+            null
+        );
+
+        Gson gson = new GsonBuilder().serializeNulls().create();
+        Type listType = new TypeToken<ArrayList<MesReferenciaFipe>>(){}.getType();
+        return gson.fromJson(output, listType);
+    }
+
     public VeiculoFipe getVeiculoFipe(int anoModelo, String codFipe) {
+        List<MesReferenciaFipe> referenciaFipeList = getMesReferenciaFipe();
 
         ParamFipe paramFipe = ParamFipe.builder()
-                .codigoTabelaReferencia(247)
+                .codigoTabelaReferencia(referenciaFipeList.get(0).getCodigo())
                 .codigoMarca("")
                 .codigoModelo("")
                 .codigoTipoVeiculo(1)
@@ -23,10 +41,22 @@ public class VeiculoService {
                 .tipoConsulta("codigo")
                 .build();
 
+        String output = createClientResponse(
+                "https://veiculos.fipe.org.br/api/veiculos/ConsultarValorComTodosParametros",
+                paramFipe
+        );
+
+        Gson gson = new GsonBuilder().serializeNulls().create();
+        VeiculoFipe veiculoFipe = gson.fromJson(output, VeiculoFipe.class);
+
+        return veiculoFipe;
+    }
+
+    public String createClientResponse(String url, ParamFipe paramFipe) {
         String paramFipeJson = new Gson().toJson(paramFipe);
         Client client = Client.create();
         WebResource webResource = client
-                .resource("https://veiculos.fipe.org.br/api/veiculos/ConsultarValorComTodosParametros");
+                .resource(url);
 
         ClientResponse response = webResource
                 .type("application/json")
@@ -45,14 +75,10 @@ public class VeiculoService {
 
         if (response.getStatus() != 200) {
             throw new RuntimeException("Failed : Http error code: "
-                + response.getStatus());
+                    + response.getStatus());
         }
 
-        String output = response.getEntity(String.class);
-        Gson gson = new GsonBuilder().serializeNulls().create();
-        VeiculoFipe veiculoFipe = gson.fromJson(output, VeiculoFipe.class);
-
-        return veiculoFipe;
+        return response.getEntity(String.class);
     }
 
 }
