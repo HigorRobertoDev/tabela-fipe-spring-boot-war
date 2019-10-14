@@ -1,6 +1,7 @@
 package com.fipe.api.controllers;
 
 import com.fipe.api.model.Marca;
+import com.fipe.api.model.Modelo;
 import com.fipe.api.model.VeiculoFipe;
 import com.fipe.api.service.VeiculoServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,10 +37,21 @@ public class VeiculoController {
     * 2 MOTO
     * 3 CAMINHÃO
     * */
-    @GetMapping("get-marcas/{codVeiculo}")
+    @GetMapping("/get-marcas/{codVeiculo}")
     public ResponseEntity<List<Marca>> findMarcaByTipoCodVeiculo(@PathVariable int codVeiculo) {
         return new ResponseEntity<>(
                 veiculoServiceImpl.getMarcaByCodVeiculo(codVeiculo),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/get-modelos-marca")
+    public ResponseEntity<Modelo> findModeloByIdMarca(
+            @RequestParam(value = "idMarca") int idMarca,
+            @RequestParam(value = "codVeiculo", defaultValue = "1") int codVeiculo
+    ) {
+        return new ResponseEntity<>(
+                veiculoServiceImpl.getModeloByIdMarca(idMarca, codVeiculo),
                 HttpStatus.OK
         );
     }

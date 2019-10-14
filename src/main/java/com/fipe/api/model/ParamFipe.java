@@ -8,10 +8,11 @@ import lombok.Data;
 public class ParamFipe {
 
     private int codigoTabelaReferencia;
-    private String codigoMarca;
+    private int codigoMarca;
     private String codigoModelo;
     private int codigoTipoVeiculo;
     private int anoModelo;
+    private int ano;
     private int codigoTipoCombustivel;
     private String tipoVeiculo;
     private String modeloCodigoExterno;

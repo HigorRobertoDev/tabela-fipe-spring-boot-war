@@ -1,9 +1,6 @@
 package com.fipe.api.service;
 
-import com.fipe.api.model.Marca;
-import com.fipe.api.model.MesReferenciaFipe;
-import com.fipe.api.model.ParamFipe;
-import com.fipe.api.model.VeiculoFipe;
+import com.fipe.api.model.*;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.sun.jersey.api.client.Client;
@@ -58,7 +55,6 @@ public class VeiculoServiceImpl implements VeiculoService {
 
         ParamFipe paramFipe = ParamFipe.builder()
                 .codigoTabelaReferencia(referenciaFipeList.get(0).getCodigo())
-                .codigoMarca("")
                 .codigoModelo("")
                 .codigoTipoVeiculo(codigoTipoVeiculo)
                 .anoModelo(anoModelo)
@@ -75,6 +71,25 @@ public class VeiculoServiceImpl implements VeiculoService {
 
         VeiculoFipe veiculoFipe = gson.fromJson(output, VeiculoFipe.class);
         return veiculoFipe;
+    }
+
+    @Override
+    public Modelo getModeloByIdMarca(int idMarca, int codVeiculo) {
+        List<MesReferenciaFipe> mesReferenciaFipeList = getMesReferenciaFipe();
+
+        ParamFipe paramFipe = ParamFipe.builder()
+                .codigoTipoVeiculo(codVeiculo)
+                .codigoTabelaReferencia(mesReferenciaFipeList.get(0).getCodigo())
+                .codigoMarca(idMarca)
+                .build();
+
+        String output = this.createClientResponse(
+                "https://veiculos.fipe.org.br/api/veiculos/ConsultarModelos",
+                paramFipe
+        );
+
+        Modelo modelo = gson.fromJson(output, Modelo.class);
+        return modelo;
     }
 
     @Override
