@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -58,7 +59,7 @@ public class VeiculoServiceImpl implements VeiculoService {
                 .codigoModelo("")
                 .codigoTipoVeiculo(codigoTipoVeiculo)
                 .anoModelo(anoModelo)
-                .codigoTipoCombustivel(codigoTipoCombustivel)
+                .codigoTipoCombustivel(String.valueOf(codigoTipoCombustivel))
                 .tipoVeiculo(tipoVeiculo)
                 .modeloCodigoExterno(codFipe)
                 .tipoConsulta("codigo")
@@ -90,6 +91,64 @@ public class VeiculoServiceImpl implements VeiculoService {
 
         Modelo modelo = gson.fromJson(output, Modelo.class);
         return modelo;
+    }
+
+    @Override
+    public ModeloDetalhado getModeloDetalhadoByIdMarca(int idMarca, int codVeiculo) {
+        Modelo modeloList = this.getModeloByIdMarca(idMarca, codVeiculo);
+        List<MesReferenciaFipe> mesReferenciaFipeList = getMesReferenciaFipe();
+        List<VeiculoFipe> veiculoFipeList = new ArrayList<>();
+
+        modeloList.getModelos().stream()
+                .forEach(marca -> {
+                    List<Marca> anoModelo = this.consultarAnoModelo(codVeiculo, mesReferenciaFipeList.get(0).getCodigo(), marca.getValue(), idMarca);
+
+                    List<String> anoVeiculoAndTipoCombustivel = Arrays.asList(anoModelo.get(0).getValue().split("-"));
+
+                    String tipoVeiculo = "carro";
+                    if (codVeiculo == 2) tipoVeiculo = "moto";
+                    else if(codVeiculo == 3) tipoVeiculo = "caminhao";
+
+                    ParamFipe paramFipe = ParamFipe.builder()
+                            .codigoTabelaReferencia(mesReferenciaFipeList.get(0).getCodigo())
+                            .codigoMarca(idMarca)
+                            .codigoModelo(marca.getValue())
+                            .codigoTipoVeiculo(codVeiculo)
+                            .anoModelo(Integer.parseInt(anoVeiculoAndTipoCombustivel.get(0)))
+                            .codigoTipoCombustivel(anoVeiculoAndTipoCombustivel.get(1))
+                            .tipoVeiculo(tipoVeiculo)
+                            .tipoConsulta("tradicional")
+                            .build();
+
+                    String output = this.createClientResponse(
+                            "https://veiculos.fipe.org.br/api/veiculos/ConsultarValorComTodosParametros",
+                            paramFipe
+                    );
+
+                    VeiculoFipe veiculoFipe = gson.fromJson(output, VeiculoFipe.class);
+                    veiculoFipeList.add(veiculoFipe);
+                });
+        ModeloDetalhado modeloDetalhado = new ModeloDetalhado();
+        modeloDetalhado.setModeloDetalhado(veiculoFipeList);
+        return modeloDetalhado;
+    }
+
+    @Override
+    public List<Marca> consultarAnoModelo(int codigoTipoVeiculo, int codigoTabelaReferencia, String codigoModelo, int codigoMarca) {
+        ParamFipe paramFipe = ParamFipe.builder()
+                .codigoTipoVeiculo(codigoTipoVeiculo)
+                .codigoTabelaReferencia(codigoTabelaReferencia)
+                .codigoModelo(codigoModelo)
+                .codigoMarca(codigoMarca)
+                .build();
+
+        String output = this.createClientResponse(
+                "https://veiculos.fipe.org.br/api/veiculos/ConsultarAnoModelo",
+                paramFipe
+        );
+
+        Type listType = new TypeToken<ArrayList<Marca>>(){}.getType();
+        return gson.fromJson(output, listType);
     }
 
     @Override

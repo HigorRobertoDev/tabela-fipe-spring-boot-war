@@ -12,8 +12,8 @@ public class ParamFipe {
     private String codigoModelo;
     private int codigoTipoVeiculo;
     private int anoModelo;
-    private int ano;
-    private int codigoTipoCombustivel;
+    private String ano;
+    private String codigoTipoCombustivel;
     private String tipoVeiculo;
     private String modeloCodigoExterno;
     private String tipoConsulta;

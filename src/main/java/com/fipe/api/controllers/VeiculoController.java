@@ -2,6 +2,7 @@ package com.fipe.api.controllers;
 
 import com.fipe.api.model.Marca;
 import com.fipe.api.model.Modelo;
+import com.fipe.api.model.ModeloDetalhado;
 import com.fipe.api.model.VeiculoFipe;
 import com.fipe.api.service.VeiculoServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,4 +57,14 @@ public class VeiculoController {
         );
     }
 
+    @GetMapping("/get-modelos-detalhado-marca")
+    public ResponseEntity<ModeloDetalhado> getModelosDetalhadoByIdMarca(
+            @RequestParam(value = "idMarca") int idMarca,
+            @RequestParam(value = "codVeiculo", defaultValue = "1") int codVeiculo
+    ) {
+        return new ResponseEntity<>(
+                veiculoServiceImpl.getModeloDetalhadoByIdMarca(idMarca, codVeiculo),
+                HttpStatus.OK
+        );
+    }
 }

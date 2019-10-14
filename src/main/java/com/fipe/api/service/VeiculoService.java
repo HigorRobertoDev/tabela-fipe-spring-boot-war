@@ -10,4 +10,6 @@ public interface VeiculoService {
     public List<Marca> getMarcaByCodVeiculo(int codVeiculo);
     public VeiculoFipe getVeiculoFipe(int anoModelo, String codFipe, int codigoTipoVeiculo, int codigoTipoCombustivel);
     public Modelo getModeloByIdMarca(int idMarca, int codVeiculo);
+    public ModeloDetalhado getModeloDetalhadoByIdMarca(int idMarca, int codVeiculo);
+    public List<Marca> consultarAnoModelo(int codigoTipoVeiculo, int codigoTabelaReferencia, String codigoModelo, int codigoMarca);
 }
