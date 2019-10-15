@@ -129,7 +129,7 @@ public class VeiculoServiceImpl implements VeiculoService {
                     veiculoFipeList.add(veiculoFipe);
                 });
         ModeloDetalhado modeloDetalhado = new ModeloDetalhado();
-        modeloDetalhado.setModeloDetalhado(veiculoFipeList);
+        modeloDetalhado.setModeloDetalhado(VeiculoFipe.bubbleSorte(veiculoFipeList));
         return modeloDetalhado;
     }
 

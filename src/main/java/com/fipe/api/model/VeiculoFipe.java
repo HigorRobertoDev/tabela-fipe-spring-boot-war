@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -44,5 +46,18 @@ public class VeiculoFipe {
     @JsonProperty("DataConsulta")
     @SerializedName("DataConsulta")
     private String dataConsulta;
+
+    public static List<VeiculoFipe> bubbleSorte(List<VeiculoFipe> values) {
+        for (int i = values.size(); i >= 1; i--) {
+            for (int j = 1; j < i; j++) {
+                if (Integer.parseInt(values.get(j - 1).getValor().replaceAll("[^0-9]", "")) > Integer.parseInt(values.get(j).getValor().replaceAll("[^0-9]", ""))) {
+                    String aux = values.get(j).getValor();
+                    values.get(j).setValor(values.get(j - 1).getValor());
+                    values.get(j - 1).setValor(aux);
+                }
+            }
+        }
+        return values;
+    }
 
 }
